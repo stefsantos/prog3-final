@@ -46,34 +46,34 @@ public class ItemPanel extends JPanel {
         public void actionPerformed(ActionEvent e) {
             String newName = JOptionPane.showInputDialog(null, "Enter the new name:", item.getName());
             if (newName != null) {
-                int newMaxStock = Integer.parseInt(JOptionPane.showInputDialog(null, "Enter the new max stock:", item.getMaxStock()));
-                int originalMaxStock = item.getMaxStock();
-    
-                // Check if the newMaxStock is less than or equal to the original max stock
-                if (newMaxStock <= originalMaxStock) {
-                    int newCalories = Integer.parseInt(JOptionPane.showInputDialog(null, "Enter the new calories:", item.getCalories()));
-                    double newPrice = Double.parseDouble(JOptionPane.showInputDialog(null, "Enter the new price:", item.getPrice()));
-    
-                    // Update the item's information
-                    item.setName(newName);
-                    item.setCalories(newCalories);
-                    item.setPrice(newPrice);
-    
-                    // Update the item button text
-                    itemButton.setText(getItemButtonText());
-                } else {
-                    // Show a warning message if the newMaxStock is greater than the original max stock
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "Invalid max stock. The new max stock cannot be greater than the original max stock.",
-                            "Invalid Input",
-                            JOptionPane.WARNING_MESSAGE
-                    );
-                }
+                int newMaxStock;
+                do {
+                    String maxStockStr = JOptionPane.showInputDialog(null, "Enter the new max stock (should not be greater than " + item.getMaxStock() + "):", item.getMaxStock());
+                    if (maxStockStr == null) {
+                        return; // User canceled the input, exit without saving changes
+                    }
+                    newMaxStock = Integer.parseInt(maxStockStr);
+                } while (newMaxStock > item.getMaxStock());
+
+                double newPrice;
+                do {
+                    String priceStr = JOptionPane.showInputDialog(null, "Enter the new price:", item.getPrice());
+                    if (priceStr == null) {
+                        return; // User canceled the input, exit without saving changes
+                    }
+                    newPrice = Double.parseDouble(priceStr);
+                } while (newPrice < 0); // Ensure price is non-negative
+
+                // Update the item's information
+                item.setName(newName);
+                item.setMaxStock(newMaxStock);
+                item.setPrice(newPrice);
+
+                // Update the item button text
+                itemButton.setText(getItemButtonText());
             }
         }
     }
-    
 
     public void toggleRestockButton(boolean isRestockMode) {
         this.isRestockMode = isRestockMode;
