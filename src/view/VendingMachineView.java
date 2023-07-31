@@ -26,6 +26,8 @@ public class VendingMachineView extends JFrame {
     private JButton insertP500Button;
     private JButton insertP1000Button;
 
+    
+
     public VendingMachineView(VendingMachineModel model) {
         this.model = model;
         setTitle("Vending Machine");
@@ -33,6 +35,7 @@ public class VendingMachineView extends JFrame {
 
         setupGUI();
 
+        setPreferredSize(new Dimension(800, 600)); // Set the preferred size of the vending machine view
         pack();
         setLocationRelativeTo(null);
     }
@@ -53,7 +56,7 @@ public class VendingMachineView extends JFrame {
             updateBillBalanceLabel();
         });
 
-        defaultButton = new JButton("Maintenance"); // Set the initial text to "Maintenance"
+        defaultButton = new JButton("Maintenance");
         defaultButton.addActionListener(new DefaultActionListener());
 
         insertP1Button = createInsertButton("Insert P1", 1.0);
@@ -76,14 +79,16 @@ public class VendingMachineView extends JFrame {
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         topPanel.add(defaultButton);
-        topPanel.add(balanceLabel); // Add balanceLabel to the top panel
+        topPanel.add(balanceLabel);
         mainPanel.add(topPanel, BorderLayout.NORTH);
 
-        mainPanel.add(itemPanel, BorderLayout.CENTER);
+        // Wrap the itemPanel with a JScrollPane
+        JScrollPane itemScrollPane = new JScrollPane(itemPanel);
+        mainPanel.add(itemScrollPane, BorderLayout.CENTER);
 
         JPanel controlPanel = new JPanel(new GridLayout(1, 2));
         controlPanel.add(produceChangeButton);
-        controlPanel.add(billBalanceLabel); // Add billBalanceLabel to the control panel
+        controlPanel.add(billBalanceLabel);
         mainPanel.add(controlPanel, BorderLayout.SOUTH);
 
         JPanel billPanel = new JPanel(new GridLayout(3, 3));
