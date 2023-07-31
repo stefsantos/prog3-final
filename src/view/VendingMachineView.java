@@ -91,7 +91,7 @@ public class VendingMachineView extends JFrame {
         controlPanel.add(billBalanceLabel);
         mainPanel.add(controlPanel, BorderLayout.SOUTH);
 
-        JPanel billPanel = new JPanel(new GridLayout(3, 3));
+        JPanel billPanel = new JPanel(new GridLayout(4, 4));
         billPanel.add(insertP1Button);
         billPanel.add(insertP5Button);
         billPanel.add(insertP10Button);
@@ -101,6 +101,33 @@ public class VendingMachineView extends JFrame {
         billPanel.add(insertP200Button);
         billPanel.add(insertP500Button);
         billPanel.add(insertP1000Button);
+
+        JButton ChangeButton = new JButton("Produce Change");
+        produceChangeButton.addActionListener(e -> {
+            model.produceChange();
+            updateBalanceLabel();
+            updateBillBalanceLabel();
+        });
+        billPanel.add(ChangeButton);
+
+        JButton summaryButton = new JButton("Summary of Transactions");
+        summaryButton.addActionListener(e -> {
+            // TODO: Implement the logic for displaying the summary of transactions.
+            // For example, you can display a new window or dialog with the transaction history.
+            // Replace the `showMessageDialog` below with your custom logic.
+            showMessageDialog("Summary of Transactions Button Pressed!");
+        });
+        billPanel.add(summaryButton);
+
+        JButton collectPaymentButton = new JButton("Collect Payment");
+        collectPaymentButton.addActionListener(e -> {
+            // TODO: Implement the logic for collecting the payment.
+            // For example, you can display a new window or dialog to confirm payment collection.
+            // Replace the `showMessageDialog` below with your custom logic.
+            showMessageDialog("Collect Payment Button Pressed!");
+        });
+        billPanel.add(collectPaymentButton);
+
 
         mainPanel.add(billPanel, BorderLayout.SOUTH);
 
