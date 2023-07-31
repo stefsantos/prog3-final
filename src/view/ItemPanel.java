@@ -47,20 +47,33 @@ public class ItemPanel extends JPanel {
             String newName = JOptionPane.showInputDialog(null, "Enter the new name:", item.getName());
             if (newName != null) {
                 int newMaxStock = Integer.parseInt(JOptionPane.showInputDialog(null, "Enter the new max stock:", item.getMaxStock()));
-                int newCalories = Integer.parseInt(JOptionPane.showInputDialog(null, "Enter the new calories:", item.getCalories()));
-                double newPrice = Double.parseDouble(JOptionPane.showInputDialog(null, "Enter the new price:", item.getPrice()));
-
-                // Update the item's information
-                item.setName(newName);
-                item.setMaxStock(newMaxStock);
-                item.setCalories(newCalories);
-                item.setPrice(newPrice);
-
-                // Update the item button text
-                itemButton.setText(getItemButtonText());
+                int originalMaxStock = item.getMaxStock();
+    
+                // Check if the newMaxStock is less than or equal to the original max stock
+                if (newMaxStock <= originalMaxStock) {
+                    int newCalories = Integer.parseInt(JOptionPane.showInputDialog(null, "Enter the new calories:", item.getCalories()));
+                    double newPrice = Double.parseDouble(JOptionPane.showInputDialog(null, "Enter the new price:", item.getPrice()));
+    
+                    // Update the item's information
+                    item.setName(newName);
+                    item.setCalories(newCalories);
+                    item.setPrice(newPrice);
+    
+                    // Update the item button text
+                    itemButton.setText(getItemButtonText());
+                } else {
+                    // Show a warning message if the newMaxStock is greater than the original max stock
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Invalid max stock. The new max stock cannot be greater than the original max stock.",
+                            "Invalid Input",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+                }
             }
         }
     }
+    
 
     public void toggleRestockButton(boolean isRestockMode) {
         this.isRestockMode = isRestockMode;
@@ -79,15 +92,19 @@ public class ItemPanel extends JPanel {
                 // Restock mode: Prompt the user for restock quantity and restock
                 String restockQuantityStr = JOptionPane.showInputDialog(null, "Enter the quantity to restock:", 1);
                 if (restockQuantityStr != null) {
-                    int restockQuantity = Integer.parseInt(restockQuantityStr);
-                    if (restockQuantity >= 0) {
-                        int currentStock = item.getStock();
-                        int newStock = Math.min(item.getMaxStock(), currentStock + restockQuantity);
-                        item.setStock(newStock);
-                        itemButton.setText(getItemButtonText());
-                        updateActionButton();
-                    } else {
-                        JOptionPane.showMessageDialog(null, "Invalid restock quantity.", "Error", JOptionPane.ERROR_MESSAGE);
+                    try {
+                        int restockQuantity = Integer.parseInt(restockQuantityStr);
+                        if (restockQuantity >= 0) {
+                            int currentStock = item.getStock();
+                            int newStock = Math.min(item.getMaxStock(), currentStock + restockQuantity);
+                            item.setStock(newStock);
+                            itemButton.setText(getItemButtonText());
+                            updateActionButton();
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Invalid restock quantity. Please enter a non-negative integer.", "Error", JOptionPane.ERROR_MESSAGE);
+                        }
+                    } catch (NumberFormatException ex) {
+                        JOptionPane.showMessageDialog(null, "Invalid input. Please enter a valid quantity.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             } else {
@@ -96,10 +113,23 @@ public class ItemPanel extends JPanel {
                     item.setStock(item.getStock() - 1);
                     itemButton.setText(getItemButtonText());
                     updateActionButton();
+                    // Show a prompt that the item has been dispensed
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Item dispensed: " + item.getName(),
+                            "Item Dispensed",
+                            JOptionPane.INFORMATION_MESSAGE
+                    );
                 } else {
-                    JOptionPane.showMessageDialog(null, "Item out of stock.", "Error", JOptionPane.ERROR_MESSAGE);
+                    // Show a message if the item is out of stock
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Item out of stock.",
+                            "Out of Stock",
+                            JOptionPane.ERROR_MESSAGE
+                    );
                 }
             }
         }
-    }
+    }    
 }

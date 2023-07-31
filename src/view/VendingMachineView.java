@@ -160,6 +160,7 @@ public class VendingMachineView extends JFrame {
             // Update restock/buy button state after toggling
             updateItemButtons();
         }
+    
     }
 
     private void updateItemButtons() {

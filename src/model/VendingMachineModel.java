@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.JOptionPane;
+
 public class VendingMachineModel {
     private int numRows;
     private List<Item> items;
@@ -106,23 +108,30 @@ public class VendingMachineModel {
     }
 
     public boolean buyItem(int rowIndex) {
-        if (rowIndex >= 0 && rowIndex < numRows) {
-            Item item = items.get(rowIndex);
-            if (item != null) {
-                int currentStock = item.getStock();
-                double itemPrice = item.getPrice();
-                double balance = moneySlot.getBalance();
+    if (rowIndex >= 0 && rowIndex < numRows) {
+        Item item = items.get(rowIndex);
+        if (item != null) {
+            int currentStock = item.getStock();
+            double itemPrice = item.getPrice();
+            double balance = moneySlot.getBalance();
 
-                if (currentStock > 0 && balance >= itemPrice) {
-                    item.setStock(currentStock - 1);
-                    moneySlot.setBalance(balance - itemPrice);
-                    //updateLabel();
-                    return true;
-                }
+            if (currentStock > 0 && balance >= itemPrice) {
+                item.setStock(currentStock - 1);
+                moneySlot.setBalance(balance - itemPrice);
+                // Show prompt that the item has been dispensed
+                JOptionPane.showMessageDialog(
+                        null,
+                        "Item dispensed: " + item.getName(),
+                        "Item Dispensed",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+                return true;
             }
         }
-        return false;
     }
+    return false;
+}
+
 
     public void produceChange() {
         double balance = moneySlot.getBalance();
