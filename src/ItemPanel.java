@@ -6,7 +6,7 @@ import java.awt.event.ActionListener;
 public class ItemPanel extends JPanel {
     private Item item;
     private JButton itemButton;
-    private JButton actionButton;   
+    private JButton actionButton;
     private boolean isRestockMode;
 
     public ItemPanel(Item item, boolean isRestockMode) {
@@ -23,9 +23,10 @@ public class ItemPanel extends JPanel {
         itemButton.addActionListener(new EditActionListener());
         add(itemButton, BorderLayout.CENTER);
 
-        actionButton = new JButton(isRestockMode ? "Restock" : "Buy");
+        actionButton = new JButton();
         actionButton.setPreferredSize(new Dimension(100, 75)); // Set a fixed size for actionButton
         actionButton.addActionListener(new ActionButtonListener());
+        updateActionButton();
         add(actionButton, BorderLayout.EAST);
     }
 
@@ -61,11 +62,11 @@ public class ItemPanel extends JPanel {
         this.isRestockMode = isRestockMode;
         updateActionButton();
     }
-    
+
     public void updateActionButton() {
-        actionButton.setText(isRestockMode ? "Restock" : "Buy");
+        String buttonText = isRestockMode ? "Restock" : (item.getStock() > 0 ? "Buy" : "Out of Stock");
+        actionButton.setText(buttonText);
     }
-    
 
     private class ActionButtonListener implements ActionListener {
         @Override
@@ -80,16 +81,17 @@ public class ItemPanel extends JPanel {
                         int newStock = Math.min(item.getMaxStock(), currentStock + restockQuantity);
                         item.setStock(newStock);
                         itemButton.setText(getItemButtonText());
+                        updateActionButton();
                     } else {
                         JOptionPane.showMessageDialog(null, "Invalid restock quantity.", "Error", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             } else {
                 // Buy mode: Buy one stock of the item
-                int currentStock = item.getStock();
-                if (currentStock > 0) {
-                    item.setStock(currentStock - 1);
+                if (item.getStock() > 0) {
+                    item.setStock(item.getStock() - 1);
                     itemButton.setText(getItemButtonText());
+                    updateActionButton();
                 } else {
                     JOptionPane.showMessageDialog(null, "Item out of stock.", "Error", JOptionPane.ERROR_MESSAGE);
                 }
