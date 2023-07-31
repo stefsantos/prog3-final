@@ -43,14 +43,25 @@ public class VendingMachineController {
     private int promptMaxStockForAllItems() {
         String input = JOptionPane.showInputDialog(
                 null,
-                "Enter the maximum stock for all items:",
+                "Enter the maximum stock for all items (at least 10):",
                 "Maximum Stock",
                 JOptionPane.QUESTION_MESSAGE
         );
         if (input != null) {
             try {
                 int maxStock = Integer.parseInt(input);
-                return maxStock;
+                if (maxStock >= 10) {
+                    return maxStock;
+                } else {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Invalid input. The maximum stock must be at least 10.",
+                            "Invalid Input",
+                            JOptionPane.WARNING_MESSAGE
+                    );
+                    // Retry the input
+                    return promptMaxStockForAllItems();
+                }
             } catch (NumberFormatException e) {
                 // Handle invalid input (not a valid integer)
                 JOptionPane.showMessageDialog(
@@ -68,6 +79,7 @@ public class VendingMachineController {
             return 0; // Not necessary, but added for clarity
         }
     }
+    
 
     private void setMaxStockForAllItems(int maxStock) {
         List<Item> items = model.getItems();
