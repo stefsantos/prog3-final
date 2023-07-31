@@ -96,7 +96,20 @@ public class ItemPanel extends JPanel {
                         int restockQuantity = Integer.parseInt(restockQuantityStr);
                         if (restockQuantity >= 0) {
                             int currentStock = item.getStock();
-                            int newStock = Math.min(item.getMaxStock(), currentStock + restockQuantity);
+                            int maxStock = item.getMaxStock();
+                            int newStock = currentStock + restockQuantity;
+
+                            if (newStock > maxStock) {
+                                // Show a warning message when restocking exceeds the max stock
+                                JOptionPane.showMessageDialog(
+                                        null,
+                                        "Restocking quantity exceeds the maximum stock.",
+                                        "Warning",
+                                        JOptionPane.WARNING_MESSAGE
+                                );
+                                return; // Exit the restocking process if the quantity exceeds the max stock
+                            }
+
                             item.setStock(newStock);
                             itemButton.setText(getItemButtonText());
                             updateActionButton();
