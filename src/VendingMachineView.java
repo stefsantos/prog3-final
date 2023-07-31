@@ -7,6 +7,7 @@ import java.util.List;
 public class VendingMachineView extends JFrame {
     private VendingMachineModel model;
     private JPanel itemPanel;
+    private JButton balanceButton; // Added balanceButton
     private JLabel balanceLabel;
     private JLabel billBalanceLabel;
     private JButton defaultButton;
@@ -62,6 +63,7 @@ public class VendingMachineView extends JFrame {
 
         balanceLabel = new JLabel("Balance: P0.00");
         balanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
+
         billBalanceLabel = new JLabel("Bill Balance: P0.00");
         billBalanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
 
@@ -69,14 +71,14 @@ public class VendingMachineView extends JFrame {
 
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         topPanel.add(defaultButton);
+        topPanel.add(balanceLabel); // Add balanceLabel to the top panel
         mainPanel.add(topPanel, BorderLayout.NORTH);
 
         mainPanel.add(itemPanel, BorderLayout.CENTER);
 
         JPanel controlPanel = new JPanel(new GridLayout(1, 2));
         controlPanel.add(produceChangeButton);
-        controlPanel.add(balanceLabel);
-
+        controlPanel.add(billBalanceLabel); // Add billBalanceLabel to the control panel
         mainPanel.add(controlPanel, BorderLayout.SOUTH);
 
         JPanel billPanel = new JPanel(new GridLayout(3, 3));
@@ -90,10 +92,14 @@ public class VendingMachineView extends JFrame {
         billPanel.add(insertP500Button);
         billPanel.add(insertP1000Button);
 
-        mainPanel.add(billBalanceLabel, BorderLayout.SOUTH);
         mainPanel.add(billPanel, BorderLayout.SOUTH);
 
         add(mainPanel);
+    }
+
+    private void updateBalanceButton() {
+        String balanceText = String.format("Balance: P%.2f", model.getMoneySlot().getBalance());
+        balanceButton.setText(balanceText);
     }
 
     public void updateBalanceLabel() {
@@ -165,7 +171,8 @@ public class VendingMachineView extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             model.getMoneySlot().insertMoney(billAmount);
-            updateBalanceLabel();
+            updateBalanceLabel(); // Update the balance label as before
+            updateBalanceButton(); // Update the balance button with the new balance
         }
     }
 }

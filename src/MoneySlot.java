@@ -21,4 +21,9 @@ public class MoneySlot {
     public double getBillBalance() {
         return billBalance;
     }
+
+    public void deductBalance(double amount) {
+        balance -= amount;
+    }
+
 }
