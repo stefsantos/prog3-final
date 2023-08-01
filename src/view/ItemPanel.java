@@ -54,7 +54,7 @@ public class ItemPanel extends JPanel {
                     }
                     newMaxStock = Integer.parseInt(maxStockStr);
                 } while (newMaxStock > item.getMaxStock());
-
+    
                 double newPrice;
                 do {
                     String priceStr = JOptionPane.showInputDialog(null, "Enter the new price:", item.getPrice());
@@ -63,18 +63,21 @@ public class ItemPanel extends JPanel {
                     }
                     newPrice = Double.parseDouble(priceStr);
                 } while (newPrice < 0); // Ensure price is non-negative
-
+    
                 // Update the item's information
                 item.setName(newName);
                 item.setMaxStock(newMaxStock);
                 item.setPrice(newPrice);
-
+    
+                // Reset the stock of the item to 0
+                item.setStock(0);
+    
                 // Update the item button text
                 itemButton.setText(getItemButtonText());
             }
         }
     }
-
+    
     public void toggleRestockButton(boolean isRestockMode) {
         this.isRestockMode = isRestockMode;
         updateActionButton();
