@@ -107,7 +107,8 @@ public class VendingMachineModel {
         }
     }
 
-    public boolean buyItem(int rowIndex) {
+    // Inside VendingMachineModel class
+public boolean buyItem(int rowIndex) {
     if (rowIndex >= 0 && rowIndex < numRows) {
         Item item = items.get(rowIndex);
         if (item != null) {
@@ -133,6 +134,7 @@ public class VendingMachineModel {
 }
 
 
+
 public void produceChange() {
     double balance = moneySlot.getBalance();
 
@@ -156,6 +158,9 @@ public void produceChange() {
 
     System.out.println(changeInfo.toString()); // Replace with UI display
     moneySlot.setBalance(0.0);
+}
+
+public void createCustomItem(List<Item> selectedItems) {
 }
 
 }

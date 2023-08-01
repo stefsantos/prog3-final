@@ -1,11 +1,13 @@
 package view;
 
+import model.Item;
 import model.VendingMachineModel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 public class SpecialVendingMachineView extends VendingMachineView {
 
@@ -67,9 +69,34 @@ public class SpecialVendingMachineView extends VendingMachineView {
     private class CustomItemActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            // TODO: Implement the logic for handling the "Custom" item button
-            // For example, you can prompt the user to enter details for the custom item.
+            // Create a new custom item window
+            CustomItemWindow customItemWindow = new CustomItemWindow();
+            customItemWindow.setVisible(true);
+        }
+    }
 
+    // Custom window class for the "Custom" button
+    private class CustomItemWindow extends JFrame {
+        public CustomItemWindow() {
+            setTitle("Custom Item Selection");
+            setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+            setupGUI();
+            pack();
+            setLocationRelativeTo(null);
+        }
+
+        private void setupGUI() {
+            JPanel mainPanel = new JPanel(new GridLayout(model.getNumRows(), 1));
+
+            List<Item> items = model.getItems();
+            for (int i = 0; i < items.size(); i++) {
+                Item item = items.get(i);
+                ItemPanel itemPanel = new ItemPanel(item, true, SpecialVendingMachineView.this); // Pass `SpecialVendingMachineView.this` as the reference
+                mainPanel.add(itemPanel);
+            }
+
+            add(mainPanel);
         }
     }
 }

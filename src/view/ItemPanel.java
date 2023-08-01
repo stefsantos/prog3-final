@@ -1,8 +1,7 @@
 package view;
+
 import javax.swing.*;
-
 import model.Item;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,7 +12,7 @@ public class ItemPanel extends JPanel {
     private JButton actionButton;
     private boolean isRestockMode;
 
-    public ItemPanel(Item item, boolean isRestockMode) {
+    public ItemPanel(Item item, boolean isRestockMode, VendingMachineView vendingMachineView) {
         this.item = item;
         this.isRestockMode = isRestockMode;
         setupPanel();
@@ -147,5 +146,5 @@ public class ItemPanel extends JPanel {
                 }
             }
         }
-    }    
+    }
 }

@@ -46,9 +46,9 @@ public class VendingMachineView extends JFrame {
 
         List<Item> items = model.getItems();
         for (int i = 0; i < items.size(); i++) {
-            ItemPanel itemPanel = new ItemPanel(items.get(i), false);
+            ItemPanel itemPanel = new ItemPanel(items.get(i), false, this); // Pass `this` as the VendingMachineView reference
             this.itemPanel.add(itemPanel);
-        }
+        }    
 
         JButton produceChangeButton = new JButton("Produce Change");
         produceChangeButton.addActionListener(e -> {
@@ -213,39 +213,55 @@ public class VendingMachineView extends JFrame {
         }
     }
 
-    public void buyCustomItem(List<Item> selectedItems) {
-        if (model == null) {
-            showMessageDialog("Please create a vending machine first.");
-            return;
-        }
-
-        // Calculate the total price of selected items
-        double totalPrice = 0.0;
-        for (Item selectedItem : selectedItems) {
-            totalPrice += selectedItem.getPrice();
-        }
-
-        // Check if there is sufficient balance
-        double balance = model.getMoneySlot().getBalance();
-        if (balance < totalPrice) {
-            showMessageDialog("Insufficient balance. Please insert more money.");
-            return;
-        }
-
-        // Deduct the total price from the balance
-        model.getMoneySlot().deductBalance(totalPrice);
-
-        // Update the stocks of selected items in the main vending machine
-        for (Item selectedItem : selectedItems) {
-            int rowIndex = model.getItems().indexOf(selectedItem);
-            model.buyItem(rowIndex);
-        }
-
-        // Update the balance label and item buttons
-        updateBalanceLabel();
-        updateItemButtons();
-        showMessageDialog("Custom items purchased successfully!");
+        // Inside VendingMachineView class
+// Inside VendingMachineView class
+public void buyCustomItem(List<Item> selectedItems) {
+    if (model == null) {
+        showMessageDialog("Please create a vending machine first.");
+        return;
     }
+
+    // Calculate the total price of selected items
+    double totalPrice = 0.0;
+    for (Item selectedItem : selectedItems) {
+        totalPrice += selectedItem.getPrice();
+    }
+
+    // Check if there is sufficient balance
+    double balance = model.getMoneySlot().getBalance();
+    if (balance < totalPrice) {
+        showMessageDialog("Insufficient balance. Please insert more money.");
+        return;
+    }
+
+    // Try to buy the selected items
+    boolean purchaseSuccessful = true;
+    for (Item selectedItem : selectedItems) {
+        int rowIndex = model.getItems().indexOf(selectedItem);
+        if (!model.buyItem(rowIndex)) {
+            // If buying an item failed due to insufficient balance, set purchaseSuccessful to false
+            purchaseSuccessful = false;
+        }
+    }
+
+    // Deduct the total price from the balance only if all items were purchased successfully
+    if (purchaseSuccessful) {
+        model.getMoneySlot().deductBalance(totalPrice);
+    }
+
+    // Update the balance label and item buttons
+    updateBalanceLabel();
+    updateItemButtons();
+
+    // Show appropriate message based on the result of the purchase
+    if (purchaseSuccessful) {
+        showMessageDialog("Items purchased successfully!");
+    } else {
+        showMessageDialog("One or more items could not be purchased due to insufficient balance.");
+    }
+}
+
+
 
     private void showMessageDialog(String message) {
         JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
@@ -285,7 +301,7 @@ public class VendingMachineView extends JFrame {
     }
 
     private void showChangeMessageDialog(List<Integer> billsUsed) {
-        StringBuilder message = new StringBuilder("Change produced:\n");
+        StringBuilder message = new StringBuilder("Change is " + "P" + model.getMoneySlot().getBalance() + "0\nDispensing:\n\n");
         int[] denominations = { 1000, 500, 200, 100, 50, 20, 10, 5, 1 };
 
         for (int i = 0; i < denominations.length; i++) {
@@ -293,7 +309,6 @@ public class VendingMachineView extends JFrame {
             int count = billsUsed.get(i);
 
             if (count > 0) {
-                message.append("P" + model.getMoneySlot().getBalance() + "0").append("\n\n Dispensing:\n");
                 message.append("P").append(denomination).append(" bills: ").append(count).append("\n");
             }
         }
