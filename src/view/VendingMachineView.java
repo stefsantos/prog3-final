@@ -297,9 +297,7 @@ public class VendingMachineView extends JFrame {
                 message.append("P").append(denomination).append(" bills: ").append(count).append("\n");
             }
         }
-
         showInfoDialog(message.toString());
+        }
     }
-}
-
 }
