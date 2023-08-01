@@ -133,28 +133,29 @@ public class VendingMachineModel {
 }
 
 
-    public void produceChange() {
-        double balance = moneySlot.getBalance();
+public void produceChange() {
+    double balance = moneySlot.getBalance();
 
-        // Define the denominations in descending order (larger denominations first)
-        double[] denominations = { 1000.0, 500.0, 200.0, 100.0, 50.0, 20.0, 10.0, 5.0, 1.0 };
+    // Define the denominations in descending order (larger denominations first)
+    double[] denominations = { 1000.0, 500.0, 200.0, 100.0, 50.0, 20.0, 10.0, 5.0, 1.0 };
 
-        StringBuilder changeInfo = new StringBuilder("Dispensing change:\n");
+    StringBuilder changeInfo = new StringBuilder("Dispensing change:\n");
 
-        for (double denomination : denominations) {
-            int numBills = (int) (balance / denomination);
-            if (numBills > 0) {
-                balance -= numBills * denomination;
-                changeInfo.append("P").append((int) denomination).append(" bill(s): ").append(numBills).append("\n");
-            }
+    for (double denomination : denominations) {
+        int numBills = (int) (balance / denomination);
+        if (numBills > 0) {
+            balance -= numBills * denomination;
+            changeInfo.append("P").append((int) denomination).append(" bill(s): ").append(numBills).append("\n");
         }
-
-        if (balance > 0.0) {
-            // If there's still a remaining balance that couldn't be dispensed in denominations
-            changeInfo.append("Remaining balance: P").append(String.format("%.2f", balance)).append("\n");
-        }
-
-        System.out.println(changeInfo.toString()); // Replace with UI display
-        moneySlot.setBalance(0.0);
     }
+
+    if (balance > 0.0) {
+        // If there's still a remaining balance that couldn't be dispensed in denominations
+        changeInfo.append("Remaining balance: P").append(String.format("%.2f", balance)).append("\n");
+    }
+
+    System.out.println(changeInfo.toString()); // Replace with UI display
+    moneySlot.setBalance(0.0);
+}
+
 }

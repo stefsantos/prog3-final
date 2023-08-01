@@ -7,6 +7,7 @@ import model.VendingMachineModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 public class VendingMachineView extends JFrame {
@@ -102,13 +103,11 @@ public class VendingMachineView extends JFrame {
         billPanel.add(insertP500Button);
         billPanel.add(insertP1000Button);
 
-        JButton ChangeButton = new JButton("Produce Change");
-        produceChangeButton.addActionListener(e -> {
-            model.produceChange();
-            updateBalanceLabel();
-            updateBillBalanceLabel();
-        });
-        billPanel.add(ChangeButton);
+        JButton changeButton = new JButton("Produce Change");
+        changeButton.addActionListener(new changeActionListener()); // Use the correct listener class name
+        controlPanel.add(changeButton);
+
+        billPanel.add(changeButton);
 
         JButton summaryButton = new JButton("Summary of Transactions");
         summaryButton.addActionListener(e -> {
@@ -248,7 +247,59 @@ public class VendingMachineView extends JFrame {
         showMessageDialog("Custom items purchased successfully!");
     }
 
-    private void showMessageDialog(String string) {
+    private void showMessageDialog(String message) {
+        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
+    }    
+
+    private void showInfoDialog(String message) {
+        JOptionPane.showMessageDialog(this, message, "", JOptionPane.INFORMATION_MESSAGE);
+    }    
+    
+
+    private class changeActionListener implements ActionListener {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        double balance = model.getMoneySlot().getBalance();
+        if (balance <= 0.0) {
+            showMessageDialog("No balance in the machine.");
+        } else {
+            List<Integer> billsUsed = calculateBillsUsedForChange(balance);
+            showChangeMessageDialog(billsUsed);
+            model.getMoneySlot().setBalance(0.0);
+            updateBalanceLabel();
+            updateBillBalanceLabel();
+        }
     }
     
+    private List<Integer> calculateBillsUsedForChange(double balance) {
+        int[] denominations = { 1000, 500, 200, 100, 50, 20, 10, 5, 1 };
+        List<Integer> billsUsed = new ArrayList<>();
+
+        for (int denomination : denominations) {
+            int count = (int) (balance / denomination);
+            balance -= count * denomination;
+            billsUsed.add(count);
+        }
+
+        return billsUsed;
+    }
+
+    private void showChangeMessageDialog(List<Integer> billsUsed) {
+        StringBuilder message = new StringBuilder("Change produced:\n");
+        int[] denominations = { 1000, 500, 200, 100, 50, 20, 10, 5, 1 };
+
+        for (int i = 0; i < denominations.length; i++) {
+            int denomination = denominations[i];
+            int count = billsUsed.get(i);
+
+            if (count > 0) {
+                message.append("P" + model.getMoneySlot().getBalance() + "0").append("\n\n Dispensing:\n");
+                message.append("P").append(denomination).append(" bills: ").append(count).append("\n");
+            }
+        }
+
+        showInfoDialog(message.toString());
+    }
+}
+
 }
