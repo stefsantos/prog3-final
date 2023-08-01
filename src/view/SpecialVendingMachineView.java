@@ -7,6 +7,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.List;
 
 public class SpecialVendingMachineView extends VendingMachineView {
@@ -77,18 +78,21 @@ public class SpecialVendingMachineView extends VendingMachineView {
 
     // Custom window class for the "Custom" button
     private class CustomItemWindow extends JFrame {
+        private List<ItemCustomPanel> itemPanels; // Keep track of the custom item panels
+        private JButton createCustomMilkTeaButton;
+
         public CustomItemWindow() {
             setTitle("Custom Item");
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
             setPreferredSize(new Dimension(400, 300)); // Set the preferred size to half of the regular vending machine window
             setLayout(new BorderLayout());
-    
+
             // Create a scroll pane to hold the custom item panels
             JScrollPane scrollPane = new JScrollPane();
             add(scrollPane, BorderLayout.CENTER);
-    
+
             JPanel mainPanel = new JPanel(new GridLayout(0, 1));
-    
+
             List<Item> items = model.getItems();
             for (int i = 0; i < items.size(); i++) {
                 Item item = items.get(i);
@@ -97,55 +101,80 @@ public class SpecialVendingMachineView extends VendingMachineView {
                     mainPanel.add(itemCustomPanel);
                 }
             }
-    
+
             scrollPane.setViewportView(mainPanel); // Add the main panel to the scroll pane
-    
-            // Create the "Create Custom Milk Tea" button
-            JButton createCustomMilkTeaButton = new JButton("Create Custom Milk Tea");
+
+            itemPanels = new ArrayList<>();
+            createCustomMilkTeaButton = new JButton("Create Custom Milk Tea");
             createCustomMilkTeaButton.addActionListener(new CreateCustomMilkTeaListener());
-            mainPanel.add(createCustomMilkTeaButton); // Add the button to the main panel
-    
-            pack(); // Adjust the window size based on the contents
+            add(createCustomMilkTeaButton, BorderLayout.SOUTH);
+
+            pack();
             setLocationRelativeTo(null);
-        }
-    
-    
-        private class ItemCustomPanel extends JPanel {
-            private Item item;
-            private JTextField stockField;
-    
-            public ItemCustomPanel(Item item) {
-                this.item = item;
-                setupPanel();
-            }
-    
-            private void setupPanel() {
-                setLayout(new BorderLayout());
-    
-                JLabel itemLabel = new JLabel(getItemLabelText());
-                add(itemLabel, BorderLayout.CENTER);
-    
-                stockField = new JTextField();
-                stockField.setPreferredSize(new Dimension(60, 30));
-                add(stockField, BorderLayout.EAST);
-            }
-    
-            private String getItemLabelText() {
-                return "<html><br><b>Name:</b> " + item.getName() +
-                        "<br><b>Stock:</b> " + item.getStock() + "/" + item.getMaxStock() +
-                        "<br><b>Calories:</b> " + item.getCalories() +
-                        "<br><b>Price:</b> P" + String.format("%.2f", item.getPrice()) + "<br></html>";
-            }
+
         }
 
+        // Listener to handle the "Create Custom Milk Tea" button click
         private class CreateCustomMilkTeaListener implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Implement the logic to handle the "Create Custom Milk Tea" button
-                // For example, you can display a new window or dialog for customizing milk tea options.
-                // Replace the following showMessageDialog with your custom logic.
-                JOptionPane.showMessageDialog(CustomItemWindow.this, "Create Custom Milk Tea Button Pressed!");
+                for (ItemCustomPanel itemPanel : itemPanels) {
+                    int newStock = itemPanel.getNewStockQuantity();
+                    itemPanel.decreaseMainStock(newStock);
+                }
+                JOptionPane.showMessageDialog(null, "Custom Milk Tea created successfully!");
+                dispose();
             }
         }
-    }    
+    }
+
+    // Custom panel class for each item in the custom window
+    private class ItemCustomPanel extends JPanel {
+        private Item item;
+        private JTextField stockField;
+
+        public ItemCustomPanel(Item item) {
+            this.item = item;
+            setupPanel();
+        }
+
+        private void setupPanel() {
+            setLayout(new BorderLayout());
+
+            JLabel itemLabel = new JLabel(getItemLabelText());
+            add(itemLabel, BorderLayout.CENTER);
+
+            stockField = new JTextField();
+            stockField.setPreferredSize(new Dimension(60, 30));
+            add(stockField, BorderLayout.EAST);
+        }
+
+        private String getItemLabelText() {
+            return "<html><br><b>Name:</b> " + item.getName() +
+                    "<br><b>Stock:</b> " + item.getStock() + "/" + item.getMaxStock() +
+                    "<br><b>Calories:</b> " + item.getCalories() +
+                    "<br><b>Price:</b> P" + String.format("%.2f", item.getPrice()) + "<br></html>";
+        }
+
+        public int getNewStockQuantity() {
+            try {
+                return Integer.parseInt(stockField.getText());
+            } catch (NumberFormatException e) {
+                return 0; // Return 0 if the input is invalid or empty
+            }
+        }
+
+        public void decreaseMainStock(int newStockQuantity) {
+            int currentStock = item.getStock();
+            int mainMachineStock = item.getMaxStock(); // Assuming item.getMaxStock() returns the maximum stock value in the main vending machine
+    
+            // Calculate the new stock for the main vending machine
+            int newMainStock = Math.max(0, mainMachineStock - (currentStock - newStockQuantity));
+    
+            // Update the item stock in the main vending machine model
+            item.setStock(newMainStock);
+        }
+
+        // Helper method to get the corresponding item in the main vending machine by name
+    }
 }
