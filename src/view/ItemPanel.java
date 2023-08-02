@@ -134,6 +134,7 @@ public class ItemPanel extends JPanel {
                     if (userBalance >= itemPrice) {
                         item.setStock(item.getStock() - 1);
                         vendingMachineView.model.getMoneySlot().deductBalance(itemPrice); // Deduct the item price from the user's balance in the view
+                        vendingMachineView.model.increaseTotalEarnings(itemPrice);
                         itemButton.setText(getItemButtonText());
                         updateActionButton();
     

@@ -27,4 +27,8 @@ public class MoneySlot {
         balance -= amount;
     }
 
+    public void resetBalance() {
+        this.balance = 0.0;
+    }
+
 }

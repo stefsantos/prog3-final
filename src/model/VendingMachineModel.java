@@ -12,12 +12,14 @@ public class VendingMachineModel {
     private MoneySlot moneySlot;
     private Map<Double, Integer> billStocks;
     private VendingMachineView view;
+    private double totalEarnings;
 
     public VendingMachineModel(int numRows) {
         this.numRows = numRows;
         this.items = new ArrayList<>();
         this.moneySlot = new MoneySlot();
         this.billStocks = new HashMap<>();
+        totalEarnings = 0.0;
         presetItems();
         presetBills();
         createEmptySlots();
@@ -118,13 +120,19 @@ public class VendingMachineModel {
             // Add this line to update the balance label after buying an item
             view.updateBalanceLabel();
     
+            // Update the total earnings when a successful purchase is made
+            double itemPrice = item.getPrice();
+            addEarnings(itemPrice);
+    
             return true;
         } else {
             return false;
         }
     }
     
-    
+
+private void addEarnings(double itemPrice) {
+    }
 
 public void produceChange() {
     double balance = moneySlot.getBalance();
@@ -151,6 +159,21 @@ public void produceChange() {
 }
 
 public void createCustomItem(List<Item> selectedItems) {
+
 }
+
+public void increaseTotalEarnings(double amount) {
+    totalEarnings += amount;
+}
+
+public double getTotalEarnings() {
+    return totalEarnings;
+}
+
+public void resetTotalEarnings() {
+    totalEarnings = 0.0;
+}
+
+    
 
 }

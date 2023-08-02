@@ -1,9 +1,9 @@
 package view;
-import javax.swing.*;
 
 import model.Item;
 import model.VendingMachineModel;
 
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -13,7 +13,7 @@ import java.util.List;
 public class VendingMachineView extends JFrame {
     protected VendingMachineModel model;
     protected JPanel itemPanel;
-    private JButton balanceButton; // Added balanceButton
+    private JButton balanceButton;
     private JLabel balanceLabel;
     private JLabel billBalanceLabel;
     private JButton defaultButton;
@@ -27,8 +27,6 @@ public class VendingMachineView extends JFrame {
     private JButton insertP500Button;
     private JButton insertP1000Button;
 
-    
-
     public VendingMachineView(VendingMachineModel model) {
         this.model = model;
         setTitle("Vending Machine");
@@ -36,7 +34,7 @@ public class VendingMachineView extends JFrame {
 
         setupGUI();
 
-        setPreferredSize(new Dimension(800, 600)); // Set the preferred size of the vending machine view
+        setPreferredSize(new Dimension(800, 600));
         pack();
         setLocationRelativeTo(null);
     }
@@ -46,16 +44,9 @@ public class VendingMachineView extends JFrame {
 
         List<Item> items = model.getItems();
         for (int i = 0; i < items.size(); i++) {
-            ItemPanel itemPanel = new ItemPanel(items.get(i), false, this); // Pass `this` as the VendingMachineView reference
+            ItemPanel itemPanel = new ItemPanel(items.get(i), false, this);
             this.itemPanel.add(itemPanel);
-        }    
-
-        JButton produceChangeButton = new JButton("Produce Change");
-        produceChangeButton.addActionListener(e -> {
-            model.produceChange();
-            updateBalanceLabel();
-            updateBillBalanceLabel();
-        });
+        }
 
         defaultButton = new JButton("Maintenance");
         defaultButton.addActionListener(new DefaultActionListener());
@@ -83,14 +74,10 @@ public class VendingMachineView extends JFrame {
         topPanel.add(balanceLabel);
         mainPanel.add(topPanel, BorderLayout.NORTH);
 
-        // Wrap the itemPanel with a JScrollPane
         JScrollPane itemScrollPane = new JScrollPane(itemPanel);
         mainPanel.add(itemScrollPane, BorderLayout.CENTER);
 
-        JPanel controlPanel = new JPanel(new GridLayout(1, 2));
-        controlPanel.add(produceChangeButton);
-        controlPanel.add(billBalanceLabel);
-        mainPanel.add(controlPanel, BorderLayout.SOUTH);
+        
 
         JPanel billPanel = new JPanel(new GridLayout(4, 4));
         billPanel.add(insertP1Button);
@@ -103,28 +90,16 @@ public class VendingMachineView extends JFrame {
         billPanel.add(insertP500Button);
         billPanel.add(insertP1000Button);
 
-        JButton changeButton = new JButton("Produce Change");
-        changeButton.addActionListener(new changeActionListener()); // Use the correct listener class name
-        controlPanel.add(changeButton);
-
-        billPanel.add(changeButton);
+        JButton produceChangeButton = new JButton("Produce Change");
+        produceChangeButton.addActionListener(new ProduceChangeActionListener());
+        billPanel.add(produceChangeButton);
 
         JButton summaryButton = new JButton("Summary of Transactions");
-        summaryButton.addActionListener(e -> {
-            // TODO: Implement the logic for displaying the summary of transactions.
-            // For example, you can display a new window or dialog with the transaction history.
-            // Replace the `showMessageDialog` below with your custom logic.
-            showMessageDialog("Summary of Transactions Button Pressed!");
-        });
+        summaryButton.addActionListener(e -> showMessageDialog("Summary of Transactions Button Pressed!"));
         billPanel.add(summaryButton);
 
         JButton collectPaymentButton = new JButton("Collect Payment");
-        collectPaymentButton.addActionListener(e -> {
-            // TODO: Implement the logic for collecting the payment.
-            // For example, you can display a new window or dialog to confirm payment collection.
-            // Replace the `showMessageDialog` below with your custom logic.
-            showMessageDialog("Collect Payment Button Pressed!");
-        });
+        collectPaymentButton.addActionListener(new CollectPaymentActionListener());
         billPanel.add(collectPaymentButton);
 
 
@@ -133,37 +108,34 @@ public class VendingMachineView extends JFrame {
         add(mainPanel);
     }
 
-    private void updateBalanceButton() {
-        String balanceText = String.format("Balance: P%.2f", model.getMoneySlot().getBalance());
-        balanceButton.setText(balanceText);
-    }
-
-    // Inside VendingMachineView class
-    public void updateBalanceLabel() {
-        double balance = model.getMoneySlot().getBalance();
-        String balanceText = String.format("Balance: P%.2f", balance);
-        balanceLabel.setText(balanceText);
-    }
-
-
-    private void updateBillBalanceLabel() {
-        String billBalanceText = String.format("Bill Balance: P%.2f", model.getMoneySlot().getBillBalance());
-        billBalanceLabel.setText(billBalanceText);
-    }
-
     private JButton createInsertButton(String buttonText, double billAmount) {
         JButton button = new JButton(buttonText);
         button.addActionListener(new InsertBillActionListener(billAmount));
         return button;
     }
 
+    private void updateBalanceButton() {
+        String balanceText = String.format("Balance: P%.2f", model.getMoneySlot().getBalance());
+        balanceButton.setText(balanceText);
+    }
+
+    public void updateBalanceLabel() {
+        double balance = model.getMoneySlot().getBalance();
+        String balanceText = String.format("Balance: P%.2f", balance);
+        balanceLabel.setText(balanceText);
+    }
+
+    private void updateBillBalanceLabel() {
+        String billBalanceText = String.format("Bill Balance: P%.2f", model.getMoneySlot().getBillBalance());
+        billBalanceLabel.setText(billBalanceText);
+    }
+
     private class DefaultActionListener implements ActionListener {
-        private boolean isMaintenanceMode = false; // Initialize to false
+        private boolean isMaintenanceMode = false;
 
         @Override
         public void actionPerformed(ActionEvent e) {
             if (isMaintenanceMode) {
-                // Switch back to default mode
                 isMaintenanceMode = false;
                 defaultButton.setText("Default");
 
@@ -174,7 +146,6 @@ public class VendingMachineView extends JFrame {
                     }
                 }
             } else {
-                // Switch to maintenance mode
                 isMaintenanceMode = true;
                 defaultButton.setText("Maintenance");
 
@@ -186,10 +157,8 @@ public class VendingMachineView extends JFrame {
                 }
             }
 
-            // Update restock/buy button state after toggling
             updateItemButtons();
         }
-    
     }
 
     private void updateItemButtons() {
@@ -211,81 +180,33 @@ public class VendingMachineView extends JFrame {
         @Override
         public void actionPerformed(ActionEvent e) {
             model.getMoneySlot().insertMoney(billAmount);
-            updateBalanceLabel(); // Update the balance label as before
-            updateBalanceButton(); // Update the balance button with the new balance
-        }
-    }
-
-        // Inside VendingMachineView class
-// Inside VendingMachineView class
-public void buyCustomItem(List<Item> selectedItems) {
-    if (model == null) {
-        showMessageDialog("Please create a vending machine first.");
-        return;
-    }
-
-    // Calculate the total price of selected items
-    double totalPrice = 0.0;
-    for (Item selectedItem : selectedItems) {
-        totalPrice += selectedItem.getPrice();
-    }
-
-    // Check if there is sufficient balance
-    double balance = model.getMoneySlot().getBalance();
-    if (balance < totalPrice) {
-        showMessageDialog("Insufficient balance. Please insert more money.");
-        return;
-    }
-
-    // Try to buy the selected items
-    boolean purchaseSuccessful = true;
-    for (Item selectedItem : selectedItems) {
-        int rowIndex = model.getItems().indexOf(selectedItem);
-        if (!model.buyItem(rowIndex)) {
-            // If buying an item failed due to insufficient balance, set purchaseSuccessful to false
-            purchaseSuccessful = false;
-        }
-    }
-
-    // Deduct the total price from the balance only if all items were purchased successfully
-    if (purchaseSuccessful) {
-        model.getMoneySlot().deductBalance(totalPrice);
-        updateBalanceLabel();
-        updateItemButtons();   
-    }
-
-    // Update the balance label and item buttons
-    updateBalanceLabel();
-    updateItemButtons();    
-
-}
-
-
-
-    private void showMessageDialog(String message) {
-        JOptionPane.showMessageDialog(this, message, "Error", JOptionPane.ERROR_MESSAGE);
-    }    
-
-    private void showInfoDialog(String message) {
-        JOptionPane.showMessageDialog(this, message, "", JOptionPane.INFORMATION_MESSAGE);
-    }    
-    
-
-    private class changeActionListener implements ActionListener {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        double balance = model.getMoneySlot().getBalance();
-        if (balance <= 0.0) {
-            showMessageDialog("No balance in the machine.");
-        } else {
-            List<Integer> billsUsed = calculateBillsUsedForChange(balance);
-            showChangeMessageDialog(billsUsed);
-            model.getMoneySlot().setBalance(0.0);
             updateBalanceLabel();
+            updateBalanceButton();
+        }
+    }
+
+    private class CollectPaymentActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            double totalEarnings = model.getTotalEarnings();
+            if (totalEarnings <= 0.0) {
+                showMessageDialog("No earnings to collect.");
+                return;
+            }
+
+            List<Integer> billsUsed = calculateBillsUsedForChange(totalEarnings);
+            showChangeMessageDialog(billsUsed, "Earnings collected: P" + String.format("%.2f", totalEarnings));
+
+            // Reset the total earnings after collecting
+            model.resetTotalEarnings();
             updateBillBalanceLabel();
         }
     }
     
+    
+    
+
+    // Helper method to calculate bills used for change
     private List<Integer> calculateBillsUsedForChange(double balance) {
         int[] denominations = { 1000, 500, 200, 100, 50, 20, 10, 5, 1 };
         List<Integer> billsUsed = new ArrayList<>();
@@ -299,19 +220,46 @@ public void buyCustomItem(List<Item> selectedItems) {
         return billsUsed;
     }
 
-    private void showChangeMessageDialog(List<Integer> billsUsed) {
-        StringBuilder message = new StringBuilder("Change is " + "P" + model.getMoneySlot().getBalance() + "0\nDispensing:\n\n");
-        int[] denominations = { 1000, 500, 200, 100, 50, 20, 10, 5, 1 };
+    private void showMessageDialog(String message) {
+        JOptionPane.showMessageDialog(this, message, "Change", JOptionPane.INFORMATION_MESSAGE);
+    }
+    // Inside VendingMachineView class
+    private class ProduceChangeActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            double balance = model.getMoneySlot().getBalance();
+            if (balance <= 0.0) {
+                showMessageDialog("No change to produce.");
+                return;
+            }
 
+            List<Integer> billsUsed = calculateBillsUsedForChange(balance);
+            showChangeMessageDialog(billsUsed, "Change: P" + String.format("%.2f", balance));
+
+            // Reset the balance after producing change
+            model.getMoneySlot().resetBalance();
+            updateBalanceLabel();
+            updateBalanceButton();
+        }
+    }
+
+    private void showChangeMessageDialog(List<Integer> billsUsed, String message) {
+        StringBuilder messageBuilder = new StringBuilder(message);
+        messageBuilder.append("\nDispensing:\n\n");
+
+        int[] denominations = { 1000, 500, 200, 100, 50, 20, 10, 5, 1 };
         for (int i = 0; i < denominations.length; i++) {
             int denomination = denominations[i];
             int count = billsUsed.get(i);
 
             if (count > 0) {
-                message.append("P").append(denomination).append(" bills: ").append(count).append("\n");
+                messageBuilder.append("P").append(denomination).append(" bills: ").append(count).append("\n");
             }
         }
-        showInfoDialog(message.toString());
-        }
+
+        showMessageDialog(messageBuilder.toString());
     }
 }
+
+
+
