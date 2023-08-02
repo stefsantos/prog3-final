@@ -14,8 +14,8 @@ import java.util.Map;
 
 public class SpecialVendingMachineView extends VendingMachineView {
 
-    private JButton customItemButton; // The "Custom" item button
-    private Map<Item, ItemCustomPanel> itemPanelsMap; // Map to keep track of the custom item panels
+    private JButton customItemButton;
+    private Map<Item, ItemCustomPanel> itemPanelsMap;
 
     public SpecialVendingMachineView(VendingMachineModel model) {
         super(model);
@@ -23,45 +23,33 @@ public class SpecialVendingMachineView extends VendingMachineView {
 
     @Override
     protected void setupGUI() {
-        // Call the setupGUI method from the parent class
         super.setupGUI();
 
-        // Add the "Custom" item button after all the regular vending machine item slots
         customItemButton = new JButton("<html>Custom</html>");
 
-        // Set the layout manager for itemPanel to GridLayout with one column
         itemPanel.setLayout(new GridLayout(0, 1));
-
-        // Get the preferred size of the largest button (itemButton or actionButton)
         Dimension largestButtonSize = getLargestButtonSize();
-
-        // Set the preferred size of all buttons to match the width of the largest button
         setButtonPreferredSize(largestButtonSize);
 
         customItemButton.addActionListener(new CustomItemActionListener());
 
-        // Add the customItemButton at the end of the itemPanel
         itemPanel.add(customItemButton);
     }
 
-    // Helper method to get the preferred size of the largest button (itemButton or actionButton)
     private Dimension getLargestButtonSize() {
         Dimension itemButtonSize = getItemButtonSize();
         Dimension actionButtonSize = getActionButtonSize();
         return new Dimension(Math.max(itemButtonSize.width, actionButtonSize.width), itemButtonSize.height);
     }
 
-    // Helper method to get the preferred size of the itemButton
     private Dimension getItemButtonSize() {
         return itemPanel.getComponent(0).getPreferredSize();
     }
 
-    // Helper method to get the preferred size of the actionButton
     private Dimension getActionButtonSize() {
         return itemPanel.getComponent(1).getPreferredSize();
     }
 
-    // Helper method to set the preferred size of all buttons to match the width of the largest button
     private void setButtonPreferredSize(Dimension preferredSize) {
         for (Component component : itemPanel.getComponents()) {
             if (component instanceof JButton) {
@@ -73,13 +61,11 @@ public class SpecialVendingMachineView extends VendingMachineView {
     private class CustomItemActionListener implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
-            // Create a new custom item window and pass the main vending machine model reference
             CustomItemWindow customItemWindow = new CustomItemWindow(SpecialVendingMachineView.this.model);
             customItemWindow.setVisible(true);
         }
     }
 
-    // Custom window class for the "Custom" button
     private class CustomItemWindow extends JFrame {
         private JCheckBox pearlsCheckBox;
         private JCheckBox cheesecakeCheckBox;
@@ -88,17 +74,17 @@ public class SpecialVendingMachineView extends VendingMachineView {
         private JCheckBox aloeVeraCheckBox;
         private JCheckBox honeyCheckBox;
         private JButton createCustomMilkTeaButton;
+        private String selectedMilkTea;
 
-        private VendingMachineModel mainVendingMachineModel; // Reference to the main vending machine model
+        private VendingMachineModel mainVendingMachineModel;
 
         public CustomItemWindow(VendingMachineModel mainVendingMachineModel) {
             this.mainVendingMachineModel = mainVendingMachineModel;
             setTitle("Custom Item");
             setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-            setPreferredSize(new Dimension(400, 400)); // Adjust the preferred size as needed
+            setPreferredSize(new Dimension(400, 400));
             setLayout(new BorderLayout());
 
-            // Add the checkboxes for addons at the top
             pearlsCheckBox = new JCheckBox("Pearls");
             cheesecakeCheckBox = new JCheckBox("Cheesecake");
             nataDeCocoCheckBox = new JCheckBox("Nata de Coco");
@@ -116,7 +102,6 @@ public class SpecialVendingMachineView extends VendingMachineView {
 
             add(checkBoxPanel, BorderLayout.NORTH);
 
-            // Create a scroll pane to hold the custom item panels
             JScrollPane scrollPane = new JScrollPane();
             add(scrollPane, BorderLayout.CENTER);
 
@@ -126,14 +111,14 @@ public class SpecialVendingMachineView extends VendingMachineView {
             itemPanelsMap = new HashMap<>();
             for (int i = 0; i < items.size(); i++) {
                 Item item = items.get(i);
-                if (!item.getName().isEmpty()) { // Check if the item name is not empty
+                if (!item.getName().isEmpty()) {
                     ItemCustomPanel itemCustomPanel = new ItemCustomPanel(item);
                     mainPanel.add(itemCustomPanel);
                     itemPanelsMap.put(item, itemCustomPanel);
                 }
             }
 
-            scrollPane.setViewportView(mainPanel); // Add the main panel to the scroll pane
+            scrollPane.setViewportView(mainPanel);
 
             createCustomMilkTeaButton = new JButton("Create Custom Milk Tea");
             createCustomMilkTeaButton.addActionListener(new CreateCustomMilkTeaListener());
@@ -143,64 +128,87 @@ public class SpecialVendingMachineView extends VendingMachineView {
             setLocationRelativeTo(null);
         }
 
-        // Listener to handle the "Create Custom Milk Tea" button click
         private class CreateCustomMilkTeaListener implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 boolean invalidInput = false;
                 boolean insufficientStock = false;
-        
+
                 List<Item> updatedItems = new ArrayList<>();
-        
+                StringBuilder addonsMessage = new StringBuilder();
+
+                int totalStock = 0;
                 for (ItemCustomPanel itemPanel : itemPanelsMap.values()) {
                     int newStock = itemPanel.getNewStockQuantity();
                     Item item = itemPanel.getItem();
                     int currentStock = item.getStock();
-        
-                    // Check if the user entered a non-positive value
+
                     if (newStock < 0) {
                         invalidInput = true;
                         break;
                     }
-        
-                    // Check if there is enough stock of the item in the main vending machine
+
                     Item mainMachineItem = findItemByName(item.getName());
                     if (mainMachineItem != null && mainMachineItem.getStock() < newStock) {
                         insufficientStock = true;
                         break;
                     }
-        
-                    // Decrease the stock in the main vending machine
+
                     if (mainMachineItem != null) {
                         mainMachineItem.setStock(mainMachineItem.getStock() - newStock);
-                        // Update the item in the main vending machine model
                         mainVendingMachineModel.updateItem(mainMachineItem);
                         updatedItems.add(mainMachineItem);
                     }
-        
-                    // Update the custom item panel's item stock
+
                     item.setStock(currentStock - newStock);
                     updatedItems.add(item);
+
+                    if (newStock > 0) {
+                        addonsMessage.append(newStock).append("x ").append(item.getName()).append(" + ");
+                    }
+
+                    totalStock += newStock;
                 }
-        
+
+                if (addonsMessage.length() > 0) {
+                    addonsMessage.delete(addonsMessage.length() - 3, addonsMessage.length());
+                }
+
                 if (invalidInput) {
                     JOptionPane.showMessageDialog(null, "Invalid input: Please enter a valid stock quantity.");
                 } else if (insufficientStock) {
                     JOptionPane.showMessageDialog(null, "There is not enough stock for a certain item.");
                 } else {
-                    // Process selected addons (for demonstration purposes, just print them)
-                    JOptionPane.showMessageDialog(null, "Custom Milk Tea created successfully!");
+                    double totalPrice = 200.0 + (totalStock * 50.0);
+                    double currentBalance = mainVendingMachineModel.getMoneySlot().getBalance();
+
+                    if (totalPrice > currentBalance) {
+                        JOptionPane.showMessageDialog(null, "Not enough money to buy. Please insert more money.");
+                        return;
+                    }
+
+                    String promptMessage = String.format("You have created a %dx %s Milk Tea with %s. Total Price: P%.2f",
+                            totalStock, selectedMilkTea, addonsMessage.toString(), totalPrice);
+                    JOptionPane.showMessageDialog(null, promptMessage);
                     dispose();
-        
-                    // Reset the stock of custom items when the custom window is closed
+
+                    // Update balance in main vending machine model
+                    mainVendingMachineModel.getMoneySlot().setBalance(currentBalance - totalPrice);
+
+                    // Show additional prompts
+                    showMixingMilkTeasPrompt();
+                    showAddingAddonsPrompt(totalStock > 0);
+
+                    // Final prompt
+                    JOptionPane.showMessageDialog(null, "Custom Milk Tea Dispensed");
+
                     for (Item item : updatedItems) {
-                        // Update the item in the main vending machine model
                         mainVendingMachineModel.updateItem(item);
                     }
                 }
             }
         }
-        
+
         private Item findItemByName(String name) {
             List<Item> items = model.getItems();
             for (Item item : items) {
@@ -210,9 +218,18 @@ public class SpecialVendingMachineView extends VendingMachineView {
             }
             return null;
         }
+
+        private void showMixingMilkTeasPrompt() {
+            JOptionPane.showMessageDialog(null, "Mixing Milk Teas");
+        }
+
+        private void showAddingAddonsPrompt(boolean hasAddons) {
+            if (hasAddons) {
+                JOptionPane.showMessageDialog(null, "Adding Addons");
+            }
+        }
     }
 
-    // Custom panel class for each item in the custom window
     private class ItemCustomPanel extends JPanel {
         private Item item;
         private JTextField stockField;
@@ -225,7 +242,7 @@ public class SpecialVendingMachineView extends VendingMachineView {
         private void setupPanel() {
             setLayout(new BorderLayout());
 
-            JLabel itemLabel = new JLabel(item.getName()); // Show only the name of the item
+            JLabel itemLabel = new JLabel(item.getName());
             add(itemLabel, BorderLayout.CENTER);
 
             stockField = new JTextField();
@@ -237,7 +254,7 @@ public class SpecialVendingMachineView extends VendingMachineView {
             try {
                 return Integer.parseInt(stockField.getText());
             } catch (NumberFormatException e) {
-                return 0; // Return 0 if the input is invalid or empty
+                return 0;
             }
         }
 

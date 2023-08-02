@@ -114,7 +114,7 @@ public class VendingMachineView extends JFrame {
         return button;
     }
 
-    private void updateBalanceButton() {
+    void updateBalanceButton() {
         String balanceText = String.format("Balance: P%.2f", model.getMoneySlot().getBalance());
         balanceButton.setText(balanceText);
     }
