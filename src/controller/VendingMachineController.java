@@ -87,4 +87,9 @@ public class VendingMachineController {
             item.setMaxStock(maxStock);
         }
     }
+
+    public void deductBalance(double amount) {
+        model.getMoneySlot().deductBalance(amount);
+    }
+
 }

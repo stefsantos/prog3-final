@@ -12,9 +12,12 @@ public class ItemPanel extends JPanel {
     private JButton actionButton;
     private boolean isRestockMode;
 
+    private VendingMachineView vendingMachineView; // Add this instance variable
+
     public ItemPanel(Item item, boolean isRestockMode, VendingMachineView vendingMachineView) {
         this.item = item;
         this.isRestockMode = isRestockMode;
+        this.vendingMachineView = vendingMachineView; // Store the reference to the VendingMachineView instance
         setupPanel();
     }
 
@@ -125,16 +128,33 @@ public class ItemPanel extends JPanel {
             } else {
                 // Buy mode: Buy one stock of the item
                 if (item.getStock() > 0) {
-                    item.setStock(item.getStock() - 1);
-                    itemButton.setText(getItemButtonText());
-                    updateActionButton();
-                    // Show a prompt that the item has been dispensed
-                    JOptionPane.showMessageDialog(
-                            null,
-                            "Item dispensed: " + item.getName(),
-                            "Item Dispensed",
-                            JOptionPane.INFORMATION_MESSAGE
-                    );
+                    double itemPrice = item.getPrice();
+                    double userBalance = vendingMachineView.model.getMoneySlot().getBalance(); // Get the user's current balance from the view
+    
+                    if (userBalance >= itemPrice) {
+                        item.setStock(item.getStock() - 1);
+                        vendingMachineView.model.getMoneySlot().deductBalance(itemPrice); // Deduct the item price from the user's balance in the view
+                        itemButton.setText(getItemButtonText());
+                        updateActionButton();
+    
+                        // Show a prompt that the item has been dispensed
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Item dispensed: " + item.getName(),
+                                "Item Dispensed",
+                                JOptionPane.INFORMATION_MESSAGE
+                        );
+                        vendingMachineView.updateBalanceLabel();
+                    } else {
+                        // Show a message if the user's balance is insufficient to buy the item
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Insufficient balance. Please insert more money.",
+                                "Insufficient Balance",
+                                JOptionPane.ERROR_MESSAGE
+                                
+                        );
+                    }
                 } else {
                     // Show a message if the item is out of stock
                     JOptionPane.showMessageDialog(

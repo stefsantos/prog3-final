@@ -4,13 +4,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JOptionPane;
+import view.VendingMachineView;
 
 public class VendingMachineModel {
     private int numRows;
     private List<Item> items;
     private MoneySlot moneySlot;
     private Map<Double, Integer> billStocks;
+    private VendingMachineView view;
 
     public VendingMachineModel(int numRows) {
         this.numRows = numRows;
@@ -108,32 +109,22 @@ public class VendingMachineModel {
     }
 
     // Inside VendingMachineModel class
-public boolean buyItem(int rowIndex) {
-    if (rowIndex >= 0 && rowIndex < numRows) {
-        Item item = items.get(rowIndex);
-        if (item != null) {
-            int currentStock = item.getStock();
-            double itemPrice = item.getPrice();
-            double balance = moneySlot.getBalance();
-
-            if (currentStock > 0 && balance >= itemPrice) {
-                item.setStock(currentStock - 1);
-                moneySlot.setBalance(balance - itemPrice);
-                // Show prompt that the item has been dispensed
-                JOptionPane.showMessageDialog(
-                        null,
-                        "Item dispensed: " + item.getName(),
-                        "Item Dispensed",
-                        JOptionPane.INFORMATION_MESSAGE
-                );
-                return true;
-            }
+    public boolean buyItem(int itemIndex) {
+        Item item = items.get(itemIndex);
+        if (item.getStock() > 0 && moneySlot.getBalance() >= item.getPrice()) {
+            item.setStock(item.getStock() - 1);
+            moneySlot.deductBalance(item.getPrice());
+    
+            // Add this line to update the balance label after buying an item
+            view.updateBalanceLabel();
+    
+            return true;
+        } else {
+            return false;
         }
     }
-    return false;
-}
-
-
+    
+    
 
 public void produceChange() {
     double balance = moneySlot.getBalance();
@@ -156,7 +147,6 @@ public void produceChange() {
         changeInfo.append("Remaining balance: P").append(String.format("%.2f", balance)).append("\n");
     }
 
-    System.out.println(changeInfo.toString()); // Replace with UI display
     moneySlot.setBalance(0.0);
 }
 

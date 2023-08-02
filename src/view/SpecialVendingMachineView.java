@@ -174,7 +174,5 @@ public class SpecialVendingMachineView extends VendingMachineView {
             // Update the item stock in the main vending machine model
             item.setStock(newMainStock);
         }
-
-        // Helper method to get the corresponding item in the main vending machine by name
     }
 }

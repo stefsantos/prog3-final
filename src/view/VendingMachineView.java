@@ -138,10 +138,13 @@ public class VendingMachineView extends JFrame {
         balanceButton.setText(balanceText);
     }
 
+    // Inside VendingMachineView class
     public void updateBalanceLabel() {
-        String balanceText = String.format("Balance: P%.2f", model.getMoneySlot().getBalance());
+        double balance = model.getMoneySlot().getBalance();
+        String balanceText = String.format("Balance: P%.2f", balance);
         balanceLabel.setText(balanceText);
     }
+
 
     private void updateBillBalanceLabel() {
         String billBalanceText = String.format("Bill Balance: P%.2f", model.getMoneySlot().getBillBalance());
@@ -247,18 +250,14 @@ public void buyCustomItem(List<Item> selectedItems) {
     // Deduct the total price from the balance only if all items were purchased successfully
     if (purchaseSuccessful) {
         model.getMoneySlot().deductBalance(totalPrice);
+        updateBalanceLabel();
+        updateItemButtons();   
     }
 
     // Update the balance label and item buttons
     updateBalanceLabel();
-    updateItemButtons();
+    updateItemButtons();    
 
-    // Show appropriate message based on the result of the purchase
-    if (purchaseSuccessful) {
-        showMessageDialog("Items purchased successfully!");
-    } else {
-        showMessageDialog("One or more items could not be purchased due to insufficient balance.");
-    }
 }
 
 
