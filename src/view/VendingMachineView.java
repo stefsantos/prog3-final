@@ -95,7 +95,7 @@ public class VendingMachineView extends JFrame {
         billPanel.add(produceChangeButton);
 
         JButton summaryButton = new JButton("Summary of Transactions");
-        summaryButton.addActionListener(e -> showMessageDialog("Summary of Transactions Button Pressed!"));
+        summaryButton.addActionListener(new SummaryButtonActionListener());
         billPanel.add(summaryButton);
 
         JButton collectPaymentButton = new JButton("Collect Payment");
@@ -221,7 +221,7 @@ public class VendingMachineView extends JFrame {
     }
 
     private void showMessageDialog(String message) {
-        JOptionPane.showMessageDialog(this, message, "Change", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(this, message, "", JOptionPane.INFORMATION_MESSAGE);
     }
     // Inside VendingMachineView class
     private class ProduceChangeActionListener implements ActionListener {
@@ -243,6 +243,34 @@ public class VendingMachineView extends JFrame {
         }
     }
 
+    private class SummaryButtonActionListener implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            List<String> transactionRecords = model.getTransactionRecords();
+            if (transactionRecords.isEmpty()) {
+                showMessageDialog("No transactions recorded since last restocking.");
+            } else {
+                StringBuilder summaryMessage = new StringBuilder("Summary of Transactions:\n\n");
+                double totalSales = 0.0;
+    
+                for (String transaction : transactionRecords) {
+                    summaryMessage.append(transaction).append("\n");
+                    totalSales += extractPriceFromTransaction(transaction);
+                }
+    
+                summaryMessage.append("\nTotal Sales: P").append(String.format("%.2f", totalSales));
+    
+                showMessageDialog(summaryMessage.toString());
+            }
+        }
+    
+        private double extractPriceFromTransaction(String transaction) {
+            String priceSubstring = transaction.substring(transaction.lastIndexOf("P") + 1);
+            return Double.parseDouble(priceSubstring);
+        }
+    }
+    
+
     private void showChangeMessageDialog(List<Integer> billsUsed, String message) {
         StringBuilder messageBuilder = new StringBuilder(message);
         messageBuilder.append("\nDispensing:\n\n");
@@ -260,6 +288,5 @@ public class VendingMachineView extends JFrame {
         showMessageDialog(messageBuilder.toString());
     }
 }
-
 
 

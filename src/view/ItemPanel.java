@@ -83,7 +83,13 @@ public class ItemPanel extends JPanel {
     public void toggleRestockButton(boolean isRestockMode) {
         this.isRestockMode = isRestockMode;
         updateActionButton();
+    
+        // Reset transaction records when restocking is performed
+        if (isRestockMode) {
+            vendingMachineView.model.resetTransactionRecords();
+        }
     }
+    
 
     public void updateActionButton() {
         String buttonText = isRestockMode ? "Restock" : (item.getStock() > 0 ? "Buy" : "Out of Stock");
@@ -137,6 +143,8 @@ public class ItemPanel extends JPanel {
                         vendingMachineView.model.increaseTotalEarnings(itemPrice);
                         itemButton.setText(getItemButtonText());
                         updateActionButton();
+                        String transaction = "Item: " + item.getName() + " | Price: P" + String.format("%.2f", itemPrice);
+                        vendingMachineView.model.addTransactionRecord(transaction);
     
                         // Show a prompt that the item has been dispensed
                         JOptionPane.showMessageDialog(

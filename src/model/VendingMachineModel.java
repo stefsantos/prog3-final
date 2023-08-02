@@ -13,12 +13,14 @@ public class VendingMachineModel {
     private Map<Double, Integer> billStocks;
     private VendingMachineView view;
     private double totalEarnings;
+    private List<String> transactionRecords;
 
     public VendingMachineModel(int numRows) {
         this.numRows = numRows;
         this.items = new ArrayList<>();
         this.moneySlot = new MoneySlot();
         this.billStocks = new HashMap<>();
+        transactionRecords = new ArrayList<>();
         totalEarnings = 0.0;
         presetItems();
         presetBills();
@@ -172,6 +174,18 @@ public double getTotalEarnings() {
 
 public void resetTotalEarnings() {
     totalEarnings = 0.0;
+}
+
+public void addTransactionRecord(String transaction) {
+    transactionRecords.add(transaction);
+}
+
+public List<String> getTransactionRecords() {
+    return transactionRecords;
+}
+
+public void resetTransactionRecords() {
+    transactionRecords.clear();
 }
 
     
