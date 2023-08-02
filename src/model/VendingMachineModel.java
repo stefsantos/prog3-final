@@ -1,4 +1,5 @@
 package model;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -118,76 +119,97 @@ public class VendingMachineModel {
         if (item.getStock() > 0 && moneySlot.getBalance() >= item.getPrice()) {
             item.setStock(item.getStock() - 1);
             moneySlot.deductBalance(item.getPrice());
-    
+
             // Add this line to update the balance label after buying an item
             view.updateBalanceLabel();
-    
+
             // Update the total earnings when a successful purchase is made
             double itemPrice = item.getPrice();
             addEarnings(itemPrice);
-    
+
             return true;
         } else {
             return false;
         }
     }
-    
 
-private void addEarnings(double itemPrice) {
+    private void addEarnings(double itemPrice) {
+        totalEarnings += itemPrice;
     }
 
-public void produceChange() {
-    double balance = moneySlot.getBalance();
+    public void produceChange() {
+        double balance = moneySlot.getBalance();
 
-    // Define the denominations in descending order (larger denominations first)
-    double[] denominations = { 1000.0, 500.0, 200.0, 100.0, 50.0, 20.0, 10.0, 5.0, 1.0 };
+        // Define the denominations in descending order (larger denominations first)
+        double[] denominations = { 1000.0, 500.0, 200.0, 100.0, 50.0, 20.0, 10.0, 5.0, 1.0 };
 
-    StringBuilder changeInfo = new StringBuilder("Dispensing change:\n");
+        StringBuilder changeInfo = new StringBuilder("Dispensing change:\n");
 
-    for (double denomination : denominations) {
-        int numBills = (int) (balance / denomination);
-        if (numBills > 0) {
-            balance -= numBills * denomination;
-            changeInfo.append("P").append((int) denomination).append(" bill(s): ").append(numBills).append("\n");
+        for (double denomination : denominations) {
+            int numBills = (int) (balance / denomination);
+            if (numBills > 0) {
+                balance -= numBills * denomination;
+                changeInfo.append("P").append((int) denomination).append(" bill(s): ").append(numBills).append("\n");
+            }
+        }
+
+        if (balance > 0.0) {
+            // If there's still a remaining balance that couldn't be dispensed in denominations
+            changeInfo.append("Remaining balance: P").append(String.format("%.2f", balance)).append("\n");
+        }
+
+        moneySlot.setBalance(0.0);
+    }
+
+    // Method to create custom item based on selected items
+    public void createCustomItem(List<Item> selectedItems) {
+        for (Item selectedItem : selectedItems) {
+            int rowIndex = items.indexOf(selectedItem);
+            if (rowIndex != -1) {
+                int newStock = selectedItem.getStock();
+                restockItem(rowIndex, -newStock);
+                selectedItem.setStock(0);
+            }
         }
     }
 
-    if (balance > 0.0) {
-        // If there's still a remaining balance that couldn't be dispensed in denominations
-        changeInfo.append("Remaining balance: P").append(String.format("%.2f", balance)).append("\n");
-    }
-
-    moneySlot.setBalance(0.0);
-}
-
-public void createCustomItem(List<Item> selectedItems) {
-
-}
-
-public void increaseTotalEarnings(double amount) {
-    totalEarnings += amount;
-}
-
-public double getTotalEarnings() {
-    return totalEarnings;
-}
-
-public void resetTotalEarnings() {
-    totalEarnings = 0.0;
-}
-
-public void addTransactionRecord(String transaction) {
-    transactionRecords.add(transaction);
-}
-
-public List<String> getTransactionRecords() {
-    return transactionRecords;
-}
-
-public void resetTransactionRecords() {
-    transactionRecords.clear();
-}
-
     
 
+    public void increaseTotalEarnings(double amount) {
+        totalEarnings += amount;
+    }
+
+    public double getTotalEarnings() {
+        return totalEarnings;
+    }
+
+    public void resetTotalEarnings() {
+        totalEarnings = 0.0;
+    }
+
+    public void addTransactionRecord(String transaction) {
+        transactionRecords.add(transaction);
+    }
+
+    public List<String> getTransactionRecords() {
+        return transactionRecords;
+    }
+
+    public void resetTransactionRecords() {
+        transactionRecords.clear();
+    }
+
+    public void setView(VendingMachineView view) {
+        this.view = view;
+    }
+
+    public void updateItem(Item item) {
+        // Find the existing item by name and update its properties
+        for (int i = 0; i < items.size(); i++) {
+            if (items.get(i).getName().equalsIgnoreCase(item.getName())) {
+                items.set(i, item);
+                break;
+            }
+        }
+    }
 }

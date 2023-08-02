@@ -270,6 +270,7 @@ public class VendingMachineView extends JFrame {
         }
     }
     
+    
 
     private void showChangeMessageDialog(List<Integer> billsUsed, String message) {
         StringBuilder messageBuilder = new StringBuilder(message);
@@ -288,5 +289,4 @@ public class VendingMachineView extends JFrame {
         showMessageDialog(messageBuilder.toString());
     }
 }
-
 
