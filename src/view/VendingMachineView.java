@@ -41,16 +41,16 @@ public class VendingMachineView extends JFrame {
 
     protected void setupGUI() {
         itemPanel = new JPanel(new GridLayout(model.getNumRows(), 1));
-
+    
         List<Item> items = model.getItems();
         for (int i = 0; i < items.size(); i++) {
             ItemPanel itemPanel = new ItemPanel(items.get(i), false, this);
             this.itemPanel.add(itemPanel);
         }
-
+    
         defaultButton = new JButton("Maintenance");
         defaultButton.addActionListener(new DefaultActionListener());
-
+    
         insertP1Button = createInsertButton("Insert P1", 1.0);
         insertP5Button = createInsertButton("Insert P5", 5.0);
         insertP10Button = createInsertButton("Insert P10", 10.0);
@@ -60,26 +60,24 @@ public class VendingMachineView extends JFrame {
         insertP200Button = createInsertButton("Insert P200", 200.0);
         insertP500Button = createInsertButton("Insert P500", 500.0);
         insertP1000Button = createInsertButton("Insert P1000", 1000.0);
-
+    
         balanceLabel = new JLabel("Balance: P0.00");
         balanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
+    
         billBalanceLabel = new JLabel("Bill Balance: P0.00");
         billBalanceLabel.setHorizontalAlignment(SwingConstants.CENTER);
-
+    
         JPanel mainPanel = new JPanel(new BorderLayout());
-
+    
         JPanel topPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         topPanel.add(defaultButton);
         topPanel.add(balanceLabel);
         mainPanel.add(topPanel, BorderLayout.NORTH);
-
+    
         JScrollPane itemScrollPane = new JScrollPane(itemPanel);
         mainPanel.add(itemScrollPane, BorderLayout.CENTER);
-
-        
-
-        JPanel billPanel = new JPanel(new GridLayout(4, 4));
+    
+        JPanel billPanel = new JPanel(new GridLayout(7, 3)); // 5 rows (4 rows for bills + 1 row for restock buttons)
         billPanel.add(insertP1Button);
         billPanel.add(insertP5Button);
         billPanel.add(insertP10Button);
@@ -89,28 +87,54 @@ public class VendingMachineView extends JFrame {
         billPanel.add(insertP200Button);
         billPanel.add(insertP500Button);
         billPanel.add(insertP1000Button);
-
+    
         JButton produceChangeButton = new JButton("Produce Change");
         produceChangeButton.addActionListener(new ProduceChangeActionListener());
         billPanel.add(produceChangeButton);
-
+    
         JButton summaryButton = new JButton("Summary of Transactions");
         summaryButton.addActionListener(new SummaryButtonActionListener());
         billPanel.add(summaryButton);
-
+    
         JButton collectPaymentButton = new JButton("Collect Payment");
         collectPaymentButton.addActionListener(new CollectPaymentActionListener());
         billPanel.add(collectPaymentButton);
-
-
+    
+        // Add the restock buttons below the last row of billPanel
+        JButton restock1Button = createRestockButton("Restock 1 Peso", 1);
+        JButton restock5Button = createRestockButton("Restock 5 Pesos", 5);
+        JButton restock10Button = createRestockButton("Restock 10 Pesos", 10);
+        JButton restock20Button = createRestockButton("Restock 20 Pesos", 20);
+        JButton restock50Button = createRestockButton("Restock 50 Pesos", 50);
+        JButton restock100Button = createRestockButton("Restock 100 Pesos", 100);
+        JButton restock200Button = createRestockButton("Restock 200 Pesos", 200);
+        JButton restock500Button = createRestockButton("Restock 500 Pesos", 500);
+        JButton restock1000Button = createRestockButton("Restock 1000 Pesos", 1000);
+    
+        billPanel.add(restock1Button);
+        billPanel.add(restock5Button);
+        billPanel.add(restock10Button);
+        billPanel.add(restock20Button);
+        billPanel.add(restock50Button);
+        billPanel.add(restock100Button);
+        billPanel.add(restock200Button);
+        billPanel.add(restock500Button);
+        billPanel.add(restock1000Button);
+    
         mainPanel.add(billPanel, BorderLayout.SOUTH);
-
+    
         add(mainPanel);
     }
-
+    
     private JButton createInsertButton(String buttonText, double billAmount) {
         JButton button = new JButton(buttonText);
         button.addActionListener(new InsertBillActionListener(billAmount));
+        return button;
+    }
+    
+    private JButton createRestockButton(String buttonText, int denomination) {
+        JButton button = new JButton(buttonText);
+        button.addActionListener(new RestockButtonActionListener(denomination));
         return button;
     }
 
@@ -169,6 +193,7 @@ public class VendingMachineView extends JFrame {
             }
         }
     }
+    
 
     private class InsertBillActionListener implements ActionListener {
         private double billAmount;
@@ -288,5 +313,48 @@ public class VendingMachineView extends JFrame {
 
         showMessageDialog(messageBuilder.toString());
     }
-}
 
+    private class RestockButtonActionListener implements ActionListener {
+        private int denomination;
+    
+        public RestockButtonActionListener(int denomination) {
+            this.denomination = denomination;
+        }
+    
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String restockQuantityStr = JOptionPane.showInputDialog(
+                    null,
+                    "Enter the quantity to restock for " + denomination + " Pesos:",
+                    1
+            );
+    
+            if (restockQuantityStr != null) {
+                try {
+                    int restockQuantity = Integer.parseInt(restockQuantityStr);
+                    if (restockQuantity >= 0) {
+                        // Call the restock method in the VendingMachineModel to update the stock for this denomination
+                        model.restock(denomination, restockQuantity);
+                        updateBalanceLabel(); // Update the balance label to reflect changes
+                    } else {
+                        JOptionPane.showMessageDialog(
+                                null,
+                                "Invalid restock quantity. Please enter a non-negative integer.",
+                                "Error",
+                                JOptionPane.ERROR_MESSAGE
+                        );
+                    }
+                } catch (NumberFormatException ex) {
+                    JOptionPane.showMessageDialog(
+                            null,
+                            "Invalid input. Please enter a valid quantity.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE
+                    );
+                }
+            }
+        }
+    }
+    
+
+}

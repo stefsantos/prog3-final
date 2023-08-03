@@ -132,47 +132,68 @@ public class SpecialVendingMachineView extends VendingMachineView {
             public void actionPerformed(ActionEvent e) {
                 boolean invalidInput = false;
                 boolean insufficientStock = false;
-
+        
                 List<Item> updatedItems = new ArrayList<>();
                 StringBuilder addonsMessage = new StringBuilder();
-
+        
                 int totalStock = 0;
                 for (ItemCustomPanel itemPanel : itemPanelsMap.values()) {
                     int newStock = itemPanel.getNewStockQuantity();
                     Item item = itemPanel.getItem();
                     int currentStock = item.getStock();
-
+        
                     if (newStock < 0) {
                         invalidInput = true;
                         break;
                     }
-
+        
+                    if (newStock > 0) {
+                        addonsMessage.append(String.format("(%dx) %s with ", newStock, item.getName()));
+                    }
+        
+                    totalStock += newStock;
+        
                     Item mainMachineItem = findItemByName(item.getName());
                     if (mainMachineItem != null && mainMachineItem.getStock() < newStock) {
                         insufficientStock = true;
                         break;
                     }
-
+        
                     if (mainMachineItem != null) {
                         mainMachineItem.setStock(mainMachineItem.getStock() - newStock);
                         mainVendingMachineModel.updateItem(mainMachineItem);
                         updatedItems.add(mainMachineItem);
                     }
-
+        
                     item.setStock(currentStock - newStock);
                     updatedItems.add(item);
-
-                    if (newStock > 0) {
-                        addonsMessage.append(newStock).append("x ").append(item.getName()).append(" + ");
-                    }
-
-                    totalStock += newStock;
                 }
-
+        
+                // Get selected addons
+                String selectedAddons = getSelectedAddons();
+        
+                // Check if any item has a quantity greater than 0
+                if (totalStock == 0) {
+                    invalidInput = true;
+                }
+        
+                // Modify the prompt message to include selected addons and quantities
+                String promptMessage;
                 if (addonsMessage.length() > 0) {
-                    addonsMessage.delete(addonsMessage.length() - 3, addonsMessage.length());
+                    addonsMessage.delete(addonsMessage.length() - 6, addonsMessage.length());
+                    if (!selectedAddons.isEmpty()) {
+                        promptMessage = String.format("You have created a %s Milk Tea with %s", addonsMessage.toString(), getSelectedAddons());
+                    } else {
+                        promptMessage = String.format("You have created a %s Milk Tea", addonsMessage.toString());
+                    }
+                } else {
+                    if (!selectedAddons.isEmpty()) {
+                        promptMessage = String.format("You have created a Milk Tea with %s", selectedAddons);
+                    } else {
+                        promptMessage = "You have created a Milk Tea";
+                    }
                 }
-
+        
                 if (invalidInput) {
                     JOptionPane.showMessageDialog(null, "Invalid input: Please enter a valid stock quantity.");
                 } else if (insufficientStock) {
@@ -180,34 +201,64 @@ public class SpecialVendingMachineView extends VendingMachineView {
                 } else {
                     double totalPrice = 200.0 + (totalStock * 50.0);
                     double currentBalance = mainVendingMachineModel.getMoneySlot().getBalance();
-
+        
                     if (totalPrice > currentBalance) {
                         JOptionPane.showMessageDialog(null, "Not enough money to buy. Please insert more money.");
                         return;
                     }
-
-                    String promptMessage = String.format("You have created a  %s Milk Tea. Total Price: P%.2f",
-                    addonsMessage.toString(), totalPrice);
+        
+                    // Show the prompt message
                     JOptionPane.showMessageDialog(null, promptMessage);
                     dispose();
-
+        
                     // Update balance in main vending machine model
                     mainVendingMachineModel.getMoneySlot().setBalance(currentBalance - totalPrice);
-
+        
                     // Show additional prompts
                     showMixingMilkTeasPrompt();
                     showAddingAddonsPrompt(totalStock > 0);
-
+        
                     // Final prompt
                     JOptionPane.showMessageDialog(null, "Custom Milk Tea Dispensed");
-
+        
                     for (Item item : updatedItems) {
                         mainVendingMachineModel.updateItem(item);
                     }
                 }
             }
+        
+            private String getSelectedAddons() {
+                StringBuilder selectedAddons = new StringBuilder();
+                if (pearlsCheckBox.isSelected()) {
+                    selectedAddons.append("Pearls, ");
+                }
+                if (cheesecakeCheckBox.isSelected()) {
+                    selectedAddons.append("Cheesecake, ");
+                }
+                if (nataDeCocoCheckBox.isSelected()) {
+                    selectedAddons.append("Nata de Coco, ");
+                }
+                if (chocolateCheckBox.isSelected()) {
+                    selectedAddons.append("Chocolate, ");
+                }
+                if (aloeVeraCheckBox.isSelected()) {
+                    selectedAddons.append("Aloe Vera, ");
+                }
+                if (honeyCheckBox.isSelected()) {
+                    selectedAddons.append("Honey, ");
+                }
+        
+                // Remove the trailing comma and space
+                if (selectedAddons.length() > 2) {
+                    selectedAddons.delete(selectedAddons.length() - 2, selectedAddons.length());
+                }
+        
+                return selectedAddons.toString();
+            }
         }
-
+        
+      
+        
         private Item findItemByName(String name) {
             List<Item> items = model.getItems();
             for (Item item : items) {
@@ -226,6 +277,24 @@ public class SpecialVendingMachineView extends VendingMachineView {
             if (hasAddons) {
                 JOptionPane.showMessageDialog(null, "Adding Addons");
             }
+        }
+
+        private String getSelectedAddons() {
+            StringBuilder selectedAddons = new StringBuilder();
+            if (pearlsCheckBox.isSelected()) {
+                selectedAddons.append("Pearls, ");
+            }
+            if (cheesecakeCheckBox.isSelected()) {
+                selectedAddons.append("Cheesecake, ");
+            }
+            // Add other checkbox items similarly
+
+            // Remove the trailing comma and space
+            if (selectedAddons.length() > 2) {
+                selectedAddons.delete(selectedAddons.length() - 2, selectedAddons.length());
+            }
+
+            return selectedAddons.toString();
         }
     }
 

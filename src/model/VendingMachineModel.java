@@ -50,16 +50,16 @@ public class VendingMachineModel {
     private void presetItems() {
         // Define the preset items
         Item[] presetItems = new Item[10];
-        presetItems[0] = new Item("Roasted Milk Tea", 10, 150, 100.00);
-        presetItems[1] = new Item("Tiramisu Milk Tea", 10, 200, 100.00);
-        presetItems[2] = new Item("Lychee Milk Tea", 10, 180, 100.00);
-        presetItems[3] = new Item("Strawberry Milk Tea", 10, 170, 100.00);
-        presetItems[4] = new Item("Honeydew Milk Tea", 10, 160, 100.00);
-        presetItems[5] = new Item("Oolong Milk Tea", 10, 110, 100.00);
-        presetItems[6] = new Item("Hazelnut Milk Tea", 10, 190, 100.00);
-        presetItems[7] = new Item("Coffee Milk Tea", 10, 160, 100.00);
-        presetItems[8] = new Item("Choco-berry Milk Tea", 10, 210, 100.00);
-        presetItems[9] = new Item("Honeydew Milk Tea", 10, 150, 100.00);
+        presetItems[0] = new Item("Roasted", 10, 150, 100.00);
+        presetItems[1] = new Item("Tiramisu", 10, 200, 100.00);
+        presetItems[2] = new Item("Lychee", 10, 180, 100.00);
+        presetItems[3] = new Item("Strawberry", 10, 170, 100.00);
+        presetItems[4] = new Item("Honeydew", 10, 160, 100.00);
+        presetItems[5] = new Item("Oolong", 10, 110, 100.00);
+        presetItems[6] = new Item("Hazelnut", 10, 190, 100.00);
+        presetItems[7] = new Item("Coffee", 10, 160, 100.00);
+        presetItems[8] = new Item("Choco-berry", 10, 210, 100.00);
+        presetItems[9] = new Item("Honeydew", 10, 150, 100.00);
 
         // Populate the items list with the preset items
         for (int i = 0; i < Math.min(numRows, presetItems.length); i++) {
@@ -173,8 +173,6 @@ public class VendingMachineModel {
         }
     }
 
-    
-
     public void increaseTotalEarnings(double amount) {
         totalEarnings += amount;
     }
@@ -212,4 +210,19 @@ public class VendingMachineModel {
             }
         }
     }
+
+    public void restock(int denomination, int quantity) {
+        Integer currentStock = billStocks.get((double) denomination);
+        if (currentStock != null) {
+            billStocks.put((double) denomination, currentStock + quantity);
+        }
+    }
+
+    public int getDenominationStock(int denomination) {
+        Integer currentStock = billStocks.get((double) denomination);
+        return (currentStock != null) ? currentStock : 0;
+    }
+
+    // Additional methods can be added here as needed.
+
 }
