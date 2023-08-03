@@ -74,7 +74,6 @@ public class SpecialVendingMachineView extends VendingMachineView {
         private JCheckBox aloeVeraCheckBox;
         private JCheckBox honeyCheckBox;
         private JButton createCustomMilkTeaButton;
-        private String selectedMilkTea;
 
         private VendingMachineModel mainVendingMachineModel;
 
@@ -187,8 +186,8 @@ public class SpecialVendingMachineView extends VendingMachineView {
                         return;
                     }
 
-                    String promptMessage = String.format("You have created a %dx %s Milk Tea with %s. Total Price: P%.2f",
-                            totalStock, selectedMilkTea, addonsMessage.toString(), totalPrice);
+                    String promptMessage = String.format("You have created a  %s Milk Tea. Total Price: P%.2f",
+                    addonsMessage.toString(), totalPrice);
                     JOptionPane.showMessageDialog(null, promptMessage);
                     dispose();
 

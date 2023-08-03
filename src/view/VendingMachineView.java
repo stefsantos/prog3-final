@@ -131,7 +131,7 @@ public class VendingMachineView extends JFrame {
     }
 
     private class DefaultActionListener implements ActionListener {
-        private boolean isMaintenanceMode = false;
+        private boolean isMaintenanceMode = true;
 
         @Override
         public void actionPerformed(ActionEvent e) {
