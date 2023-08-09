@@ -172,7 +172,7 @@ public class VendingMachineView extends JFrame {
             } else {
                 isMaintenanceMode = true;
                 defaultButton.setText("Maintenance");
-
+                
                 Component[] components = itemPanel.getComponents();
                 for (Component component : components) {
                     if (component instanceof ItemPanel) {
@@ -227,9 +227,6 @@ public class VendingMachineView extends JFrame {
             updateBillBalanceLabel();
         }
     }
-    
-    
-    
 
     // Helper method to calculate bills used for change
     private List<Integer> calculateBillsUsedForChange(double balance) {

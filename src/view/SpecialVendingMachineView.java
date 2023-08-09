@@ -279,23 +279,6 @@ public class SpecialVendingMachineView extends VendingMachineView {
             }
         }
 
-        private String getSelectedAddons() {
-            StringBuilder selectedAddons = new StringBuilder();
-            if (pearlsCheckBox.isSelected()) {
-                selectedAddons.append("Pearls, ");
-            }
-            if (cheesecakeCheckBox.isSelected()) {
-                selectedAddons.append("Cheesecake, ");
-            }
-            // Add other checkbox items similarly
-
-            // Remove the trailing comma and space
-            if (selectedAddons.length() > 2) {
-                selectedAddons.delete(selectedAddons.length() - 2, selectedAddons.length());
-            }
-
-            return selectedAddons.toString();
-        }
     }
 
     private class ItemCustomPanel extends JPanel {
